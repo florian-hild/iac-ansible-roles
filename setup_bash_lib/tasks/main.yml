@@ -1,0 +1,15 @@
+---
+
+- name: Clone bash-lib repository
+  tags: setup_bash_lib
+  no_log: true
+  become: true
+  ansible.builtin.git:
+    repo: "{{ bash_lib_repo }}"
+    dest: "{{ bash_lib_dst }}"
+    clone: true
+    update: true
+    single_branch: true
+    version: "{{ bash_lib_repo_branch }}"
+
+...

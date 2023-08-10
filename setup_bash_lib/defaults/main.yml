@@ -1,0 +1,8 @@
+---
+
+github_api_token: null
+bash_lib_repo: "https://{{ github_api_token }}@github.com/florian-hild/bash-lib.git"
+bash_lib_dst: /usr/local/bin
+bash_lib_repo_branch: main
+
+...
