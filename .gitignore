@@ -1,0 +1,26 @@
+# Folders
+.worktree
+
+# Ansible Galaxy
+meta/.galaxy_install_info
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+.cache/
+known_hosts
+nohup.out
+$RECYCLE.BIN/
+[Dd]esktop.ini
+*~
+
+# Ignore files created by IDE's
+.vscode
+.theia
+.Trash*

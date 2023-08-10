@@ -1,0 +1,49 @@
+---
+
+name: Check syntax with linters
+
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check-yaml-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run yamllint with python3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install yamllint via pip
+        run: python3 -m pip install yamllint
+
+      - name: Run yamllint with config
+        run: yamllint --config-file .yamllint.yml .
+
+  check-ansible-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run ansible-lint with python3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install ansible-lint via pip
+        run: python3 -m pip install ansible-lint
+
+      - name: Install collection community.general
+        run: ansible-galaxy collection install community.general
+
+      - name: Run ansible-lint with config
+        run: ansible-lint --config-file .ansible-lint.yml .
+
+...

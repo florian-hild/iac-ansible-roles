@@ -1,0 +1,10 @@
+---
+
+skip_list:
+  - no-changed-when
+  - yaml[line-length]
+  - yaml[comments]
+  - yaml[document-start]
+  - name[template]
+
+...
