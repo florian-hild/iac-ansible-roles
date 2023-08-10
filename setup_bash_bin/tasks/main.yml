@@ -1,0 +1,36 @@
+---
+
+- name: Clone bash-bin repository
+  tags: setup_bash_bin
+  no_log: true
+  become: true
+  ansible.builtin.git:
+    repo: "{{ bash_bin_repo }}"
+    dest: "{{ bash_bin_dst }}"
+    clone: true
+    update: true
+    single_branch: true
+    version: "{{ bash_bin_repo_branch }}"
+
+- name: Find all shell scripts to symlink
+  tags: setup_bash_bin
+  register: scripts
+  ansible.builtin.find:
+    paths: "{{ bash_bin_dst }}"
+    file_type: file
+    use_regex: true
+    patterns: ['.*.sh$']
+
+- name: Create symlinks to /usr/local/bin
+  tags: setup_bash_bin
+  become: true
+  ansible.builtin.file:
+    src: "{{ file.path }}"
+    path: "/usr/local/bin/{{ file.path | basename }}"
+    state: link
+  with_items: "{{ scripts.files }}"
+  loop_control:
+    loop_var: file
+    label: "{{ file.path | basename }}"
+
+...
