@@ -1,5 +1,4 @@
 # Ansible Role: setup_bash_lib
----
 Clone GitHub repo bash-lib to /usr/local/bin
 
 ## Role Variables
