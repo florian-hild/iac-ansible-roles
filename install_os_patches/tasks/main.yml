@@ -1,0 +1,38 @@
+---
+
+- name: Upgrade Debain based systems
+  tags:
+    - update_os_update
+    - update_os
+  become: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  block:
+    - name: Upgrade the operating system using apt
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Update all packages to the latest version using apt
+      tags: skip_ansible_lint
+      ansible.builtin.apt:
+        name: "*"
+        update_cache: true
+        cache_valid_time: 3600
+        state: latest
+
+- name: Upgrade RHEL based systems
+  tags:
+    - update_os_update
+    - update_os
+  become: true
+  when: ansible_os_family == "RedHat"
+  block:
+    - name: Update all packages to the latest version using dnf
+      tags: skip_ansible_lint
+      ansible.builtin.dnf:
+        update_cache: true
+        state: latest
+        pkg: "*"
+
+...
