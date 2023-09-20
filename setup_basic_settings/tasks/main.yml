@@ -1,0 +1,101 @@
+---
+
+- name: Ensure locales exists on debian based systems
+  tags:
+    - setup_basic_settings_locales
+    - setup_basic_settings
+  become: true
+  when: ansible_os_family != "RedHat"
+  community.general.locale_gen:
+    name: "{{ locale }}"
+    state: present
+  with_items:
+    "{{ supported_locales }}"
+  loop_control:
+    loop_var: locale
+
+- name: Deploy /etc/locale.conf
+  tags:
+    - setup_basic_settings_locales
+    - setup_basic_settings
+  become: true
+  ansible.builtin.template:
+    src: templates/etc/locale.conf.j2
+    dest: /etc/locale.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+
+- name: Create symlinks /etc/locale.conf --> /etc/default/locale
+  tags:
+    - setup_basic_settings_locales
+    - setup_basic_settings
+  become: true
+  ansible.builtin.file:
+    src: /etc/locale.conf
+    path: /etc/default/locale
+    force: true
+    state: link
+
+- name: "Set timezone to {{ timezone }}"
+  tags:
+    - setup_basic_settings_timezone
+    - setup_basic_settings
+  become: true
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: "Make sure /etc/timezone contains {{ timezone }}"
+  tags:
+    - setup_basic_settings_timezone
+    - setup_basic_settings
+  become: true
+  ansible.builtin.template:
+    src: templates/etc/timezone.j2
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: '0644'
+    backup: false
+
+- name: "Setup /etc/resolv.conf"
+  tags:
+    - setup_basic_settings_dns
+    - setup_basic_settings
+  become: true
+  ansible.builtin.template:
+    src: templates/etc/resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+
+- name: Install packages on Debian or Ubuntu system
+  tags:
+    - setup_basic_settings_install_pkg
+    - setup_basic_settings
+    - skip_ansible_lint
+  become: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    state: latest
+    pkg: "{{ pkg_list_apt }}"
+
+
+- name: Install packages on RHEL based system
+  tags:
+    - setup_basic_settings_install_pkg
+    - setup_basic_settings
+    - skip_ansible_lint
+  become: true
+  when: ansible_os_family == "RedHat"
+  ansible.builtin.dnf:
+    update_cache: true
+    state: latest
+    pkg: "{{ pkg_list_dnf }}"
+
+...

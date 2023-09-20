@@ -1,0 +1,52 @@
+---
+
+# Only for debian based systems
+supported_locales:
+  - en_US.UTF-8
+  - de_DE.UTF-8
+
+env_locales:
+  - LANG="en_US.UTF-8"
+  - LC_CTYPE="en_US.UTF-8"
+  - LC_TIME="de_DE.UTF-8"
+  - LC_MESSAGES="en_US.UTF-8"
+
+timezone: Europe/Berlin
+
+nameservers:
+  - 1.1.1.1
+  - 9.9.9.9
+  - 8.8.8.8
+
+searchdomains:
+  - "{{ ansible_domain }}"
+
+pkg_list_apt:
+  - vim
+  - git
+  - jq
+  - tree
+  - sudo
+  - curl
+  - tcpdump
+  - net-tools
+  - dnsutils
+  - rsync
+  - unzip
+  - zip
+
+pkg_list_dnf:
+  - vim
+  - git
+  - jq
+  - tree
+  - sudo
+  - curl
+  - tcpdump
+  - net-tools
+  - dnsutils
+  - rsync
+  - unzip
+  - zip
+
+...
