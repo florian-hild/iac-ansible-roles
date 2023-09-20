@@ -1,0 +1,10 @@
+---
+
+remote_ansible_username: ansible
+remote_ansible_uid: "{{ omit }}"
+remote_ansible_password: null
+remote_ansible_home: /home/ansible
+remote_ansible_shell: /bin/bash
+remote_ansible_ssh_pub: null
+
+...
