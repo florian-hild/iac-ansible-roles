@@ -41,7 +41,7 @@ jobs:
         run: python3 -m pip install ansible-lint
 
       - name: Install collection community.general
-        run: ansible-galaxy collection install community.general
+        run: ansible-galaxy collection install community.general ansible.posix
 
       - name: Run ansible-lint with config
         run: ansible-lint --config-file .ansible-lint.yml *
