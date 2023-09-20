@@ -12,7 +12,7 @@
     single_branch: true
     version: "{{ bash_bin_repo_branch }}"
 
-- name: Find all shell scripts to symlink
+- name: Find all shell scripts to create symlinks
   tags: setup_bash_bin
   register: scripts
   ansible.builtin.find:
