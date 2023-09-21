@@ -1,0 +1,12 @@
+{
+  "storage-driver": "{{ docker_storage_driver }}",
+  "log-driver": "{{ docker_log_driver }}",
+  "default-address-pools": [
+    {% for pool in docker_default_address_pools -%}
+    {
+      "base": "{{ pool.base }}",
+      "size": {{ pool.size }}
+    }{% if not loop.last %},{% endif %}
+    {%- endfor +%}
+  ]
+}

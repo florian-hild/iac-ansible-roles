@@ -1,0 +1,122 @@
+---
+
+# Makes sure linkt /etc/localtime exists
+- name: "Set timezone to {{ timezone }}"
+  tags:
+    - setup_docker_pre_setup
+    - setup_docker
+  become: true
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: "Make sure /etc/timezone contains {{ timezone }}"
+  tags:
+    - setup_docker_pre_setup
+    - setup_docker
+  become: true
+  ansible.builtin.template:
+    src: templates/etc/timezone.j2
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: '0644'
+    backup: false
+
+- name: Install Docker for Debian or Ubuntu
+  tags:
+    - setup_docker_install
+    - setup_docker
+  become: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  block:
+    - name: Add repo public key
+      ansible.builtin.get_url:
+        url: "{{ docker_debian_repo_gpg_url }}"
+        checksum: "{{ docker_debian_repo_gpg_url_checksum }}"
+        dest: /etc/apt/keyrings/docker-archive-keyring.asc
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+
+    - name: Add docker repository
+      tags: skip_ansible_lint
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker-archive-keyring.asc] {{ docker_debian_repo_url }} {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker packages
+      tags: skip_ansible_lint
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+        state: latest
+        pkg: "{{ docker_repos_pkg_apt }}"
+
+- name: Get latest docker-compose release
+  tags:
+    - setup_docker_install
+    - setup_docker_compose_install
+    - setup_docker
+  register: json_reponse
+  ansible.builtin.uri:
+    url: "{{ docker_compose_repo_api_url }}"
+    return_content: true
+
+- name: "Download docker-compose version {{ json_reponse.json.tag_name }}"
+  tags:
+    - setup_docker_install
+    - setup_docker_compose_install
+    - setup_docker
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ docker_compose_repo_download_url }}/{{ json_reponse.json.tag_name }}/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+    dest: "/usr/local/bin/docker-compose-{{ json_reponse.json.tag_name }}"
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: "Create symlinks /usr/local/bin/docker-compose-{{ json_reponse.json.tag_name }} --> /usr/local/bin/docker-compose"
+  tags:
+    - setup_docker_install
+    - setup_docker_compose_install
+    - setup_docker
+    - skip_ansible_lint
+  become: true
+  ansible.builtin.file:
+    src: /usr/local/bin/docker-compose-{{ json_reponse.json.tag_name }}
+    path: /usr/local/bin/docker-compose
+    force: true
+    state: link
+
+- name: Deploy /etc/docker/daemon.json
+  tags:
+    - setup_docker_setup
+    - setup_docker
+  become: true
+  notify: Restart docker service
+  ansible.builtin.template:
+    src: templates/etc/docker/daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+
+- name: Trigger handlers
+  tags:
+    - setup_docker_setup
+    - setup_docker
+  ansible.builtin.meta: flush_handlers
+
+- name: Make sure docker service is started and enabled
+  tags:
+    - setup_docker_setup
+    - setup_docker
+  become: true
+  ansible.builtin.systemd:
+    name: docker.service
+    state: started
+    enabled: true
+
+...
