@@ -2,7 +2,7 @@
 
 github_api_token: null
 bash_bin_repo: "https://{{ github_api_token }}@github.com/florian-hild/bash-bin.git"
-bash_bin_dst: /usr/local/bin/bash-bin
 bash_bin_repo_branch: main
+bash_bin_dst: /usr/local/bin/bash-bin
 
 ...
