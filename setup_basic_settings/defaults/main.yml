@@ -28,6 +28,7 @@ pkg_list_apt:
   - tree
   - sudo
   - curl
+  - wget
   - tcpdump
   - net-tools
   - dnsutils
