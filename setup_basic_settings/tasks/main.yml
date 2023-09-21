@@ -5,7 +5,7 @@
     - setup_basic_settings_locales
     - setup_basic_settings
   become: true
-  when: ansible_os_family != "RedHat"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   community.general.locale_gen:
     name: "{{ locale }}"
     state: present
@@ -58,6 +58,21 @@
     group: root
     mode: '0644'
     backup: false
+
+- name: Create .pve-ignore.resolv.conf to prevent changes from pve
+  tags:
+    - setup_basic_settings_dns
+    - setup_basic_settings
+  become: true
+  when: ansible_virtualization_type == "lxc"
+  ansible.builtin.file:
+    path: /etc/.pve-ignore.resolv.conf
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+    modification_time: preserve
+    access_time: preserve
 
 - name: "Setup /etc/resolv.conf"
   tags:

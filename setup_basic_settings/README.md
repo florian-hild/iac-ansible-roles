@@ -19,6 +19,7 @@ Ansible facts used:
    - ansible_os_family
    - ansible_distribution
    - ansible_domain
+   - ansible_virtualization_type
 
 ## License
 See repository license file.
