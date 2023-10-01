@@ -1,5 +1,7 @@
 ---
 
+hostname: "{{ ansible_nodename }}"
+
 # Only for debian based systems
 supported_locales:
   - en_US.UTF-8
@@ -12,6 +14,11 @@ env_locales:
   - LC_MESSAGES="en_US.UTF-8"
 
 timezone: Europe/Berlin
+
+hosts_entries: []
+  # - ip: 1.1.1.1
+  #   hostname: one.one
+  #   fqdn: one.one.one.one
 
 nameservers:
   - 1.1.1.1

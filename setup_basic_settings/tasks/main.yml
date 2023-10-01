@@ -1,5 +1,33 @@
 ---
 
+- name: Create .pve-ignore.hostname to prevent changes from pve
+  tags:
+    - setup_basic_settings_hostname
+    - setup_basic_settings
+  become: true
+  when: ansible_virtualization_type == "lxc"
+  ansible.builtin.file:
+    path: /etc/.pve-ignore.hostname
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+    modification_time: preserve
+    access_time: preserve
+
+- name: "Setup /etc/hostname"
+  tags:
+    - setup_basic_settings_hostname
+    - setup_basic_settings
+  become: true
+  ansible.builtin.template:
+    src: templates/etc/hostname.j2
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+
 - name: Ensure locales exists on debian based systems
   tags:
     - setup_basic_settings_locales
@@ -59,20 +87,62 @@
     mode: '0644'
     backup: false
 
-- name: Create .pve-ignore.resolv.conf to prevent changes from pve
+- name: Create .pve-ignore.hosts to prevent changes from pve
   tags:
-    - setup_basic_settings_dns
+    - setup_basic_settings_hosts
     - setup_basic_settings
   become: true
   when: ansible_virtualization_type == "lxc"
   ansible.builtin.file:
-    path: /etc/.pve-ignore.resolv.conf
+    path: /etc/.pve-ignore.hosts
     state: touch
     owner: root
     group: root
     mode: '0644'
     modification_time: preserve
     access_time: preserve
+
+- name: "Setup /etc/hosts"
+  tags:
+    - setup_basic_settings_hosts
+    - setup_basic_settings
+  become: true
+  ansible.builtin.template:
+    src: templates/etc/hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+
+# - name: Create .pve-ignore.resolv to prevent changes from pve
+#   tags:
+#     - setup_basic_settings_dns
+#     - setup_basic_settings
+#   become: true
+#   when: ansible_virtualization_type == "lxc"
+#   ansible.builtin.file:
+#     path: /etc/.pve-ignore.resolv
+#     state: touch
+#     owner: root
+#     group: root
+#     mode: '0644'
+#     modification_time: preserve
+#     access_time: preserve
+
+- name: "Setup dhcp nodnschange config"
+  tags:
+    - setup_basic_settings_dns
+    - setup_basic_settings
+  become: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  ansible.builtin.template:
+    src: templates/etc/dhcp/dhclient-enter-hooks.d/nodnsupdate.j2
+    dest: /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate
+    owner: root
+    group: root
+    mode: '0754'
+    backup: true
 
 - name: "Setup /etc/resolv.conf"
   tags:

@@ -3,8 +3,10 @@
 Things I like to set up on my servers.
 
 Tasks:
+  - Setup hostname
   - Setup system locales
   - Setup timezone
+  - Setup hosts
   - Setup nameserver config in resolv.conf
   - Install basic packages
 
@@ -20,6 +22,9 @@ Ansible facts used:
    - ansible_distribution
    - ansible_domain
    - ansible_virtualization_type
+   - ansible_hostname
+   - ansible_nodename
+   - ansible_default_ipv4.address
 
 ## License
 See repository license file.

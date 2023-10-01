@@ -1,0 +1,8 @@
+# <IP-Address>      <Hostname>         <FQDN>
+127.0.0.1          localhost
+127.0.1.1          {{ '%-15s' | format(ansible_hostname) }}    {{ ansible_nodename }}
+{{ '%-15s' | format(ansible_default_ipv4.address) }}    {{ '%-15s' | format(ansible_hostname) }}    {{ ansible_nodename }}
+
+{% for entry in hosts_entries %}
+{{ '%-15s' | format(entry.ip) }}    {{ '%-15s' | format(entry.hostname | default('')) }}    {{ entry.fqdn | default('') }}
+{% endfor %}
