@@ -8,5 +8,15 @@
       "size": {{ pool.size }}
     }{% if not loop.last %},{% endif %}
     {%- endfor +%}
+  ],
+  "dns": [
+    {% for ns in nameservers -%}
+    "{{ ns }}"{% if not loop.last %},{% endif %}
+    {%- endfor +%}
+  ],
+  "dns-search": [
+    {% for searchdomain in searchdomains -%}
+    "{{ searchdomain }}"{% if not loop.last %},{% endif %}
+    {%- endfor +%}
   ]
 }
