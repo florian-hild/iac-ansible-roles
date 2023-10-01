@@ -4,6 +4,7 @@ skip_list:
   - no-changed-when
   - yaml[line-length]
   - yaml[comments]
+  - yaml[comments-indentation]
   - yaml[document-start]
   - name[template]
 
