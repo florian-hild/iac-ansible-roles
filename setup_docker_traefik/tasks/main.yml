@@ -1,0 +1,117 @@
+---
+
+- name: Run
+  tags: setup_docker_traefik
+  block:
+    # Makes sure linkt /etc/localtime exists
+    - name: "Set timezone to {{ timezone }}"
+      become: true
+      community.general.timezone:
+        name: "{{ timezone }}"
+
+    - name: "Make sure /etc/timezone contains {{ timezone }}"
+      become: true
+      ansible.builtin.template:
+        src: etc/timezone.j2
+        dest: /etc/timezone
+        owner: root
+        group: root
+        mode: '0644'
+        backup: false
+
+    - name: Make sure Docker deamon is available
+      become: true
+      community.docker.docker_host_info:
+
+    - name: Create required directories
+      tags: setup_docker_traefik_deploy
+      become: true
+      ansible.builtin.file:
+        path: "{{ dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop: "{{ docker_traefik_project_dirs }}"
+      loop_control:
+        loop_var: dir
+
+    - name: Deploy docker-compose file
+      tags: setup_docker_traefik_deploy
+      become: true
+      notify: Run docker-compose
+      ansible.builtin.template:
+        src: docker-compose.yml.j2
+        dest: "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+
+    - name: Check if acme config file exists
+      tags: setup_docker_traefik_deploy
+      become: true
+      register: acme_file
+      ansible.builtin.stat:
+        path: "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}/config/acme.json"
+
+    - name: Deploy empty acme file
+      tags: setup_docker_traefik_deploy
+      become: true
+      notify: Run docker-compose
+      when: not acme_file.stat.exists
+      ansible.builtin.template:
+        src: config/acme.json.j2
+        dest: "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}/config/acme.json"
+        owner: root
+        group: root
+        mode: '0600'
+        backup: true
+
+    - name: Deploy traefik config
+      tags: setup_docker_traefik_deploy
+      become: true
+      notify: Run docker-compose
+      ansible.builtin.template:
+        src: config/traefik.yml.j2
+        dest: "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}/config/traefik.yml"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+
+    - name: Deploy traefik dynamic-config
+      tags: setup_docker_traefik_deploy
+      become: true
+      notify: Run docker-compose
+      ansible.builtin.template:
+        src: config/dynamic_config/config.yml.j2
+        dest: "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}/config/dynamic_config/config.yml"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+
+    - name: Trigger handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: "Get infos about container {{ docker_traefik_container_name }}"
+      become: true
+      register: container_info
+      community.docker.docker_container_info:
+        name: "{{ docker_traefik_container_name }}"
+
+    - name: Run docker-compose
+      become: true
+      environment:
+        PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+      when: not container_info.exists
+      ansible.builtin.shell:
+        chdir: "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}"
+        executable: /bin/bash
+        cmd: |
+          docker-compose pull
+          docker-compose build --no-cache
+          docker-compose up --force-recreate --detach --remove-orphans
+
+...

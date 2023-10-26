@@ -1,0 +1,43 @@
+---
+
+services:
+  traefik:
+    container_name: {{ docker_traefik_container_name }}
+    image: '{{ docker_traefik_container_image }}'
+    init: true
+    privileged: false
+    security_opt:
+      - 'no-new-privileges:true'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    environment:
+      - 'TZ=Europe/Berlin'
+      - 'HETZNER_API_KEY={{ docker_traefik_hetzner_api_key }}'
+    volumes:
+      - '/etc/localtime:/etc/localtime:ro'
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - './config/traefik.yml:/etc/traefik/traefik.yml:ro'
+      - './config/dynamic_config:/etc/traefik/dynamic_config:ro'
+      - './config/acme.json:/etc/traefik/acme.json:rw'
+    networks:
+      - frontend
+    ports:
+      - '0.0.0.0:80:80/tcp'
+      - '0.0.0.0:443:443/tcp'
+    labels:
+      - 'traefik.http.routers.traefik-test-secure.service=api@internal'
+      - 'traefik.http.routers.traefik-test-secure.middlewares=traefik-auth'
+      # Create psw using: openssl passwd -salt <salt> -1 <plaintext> | sed -e s/\\$/\\$\\$/g
+      - 'traefik.http.middlewares.traefik-auth.basicauth.users={{ docker_traefik_traefik_basicauth }}'
+
+networks:
+  frontend:
+    name: traefik-frontend
+    driver: bridge
+
+...

@@ -1,0 +1,19 @@
+---
+
+timezone: Europe/Berlin
+
+docker_traefik_data_path: /data
+docker_traefik_container_name: traefik
+docker_traefik_container_image: 'traefik:latest'
+docker_traefik_hetzner_api_key: null
+docker_traefik_traefik_basicauth: null
+docker_traefik_project_dirs:
+  - "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}"
+  - "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}/config"
+  - "{{ docker_traefik_data_path }}/{{ docker_traefik_container_name }}/config/dynamic_config"
+docker_traefik_domain_main: null
+docker_traefik_domain_sans: null
+docker_traefik_acme_mail: null
+docker_traefik_fqdn_sufix: null
+
+...
