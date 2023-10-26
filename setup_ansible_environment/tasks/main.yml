@@ -36,7 +36,7 @@
     name: sudo
     state: present
 
-- name: Deploy supcis_sudoers configuration
+- name: Deploy ansible_sudoers configuration
   tags:
     - setup_ansible_environment
     - setup_ansible_environment_deploy_sudoers
