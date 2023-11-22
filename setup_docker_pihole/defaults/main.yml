@@ -1,0 +1,12 @@
+---
+
+timezone: Europe/Berlin
+
+docker_pihole_data_path: /data
+docker_pihole_container_name: pihole
+docker_pihole_container_image: 'ghcr.io/pi-hole/pihole:latest'
+docker_pihole_project_dirs:
+  - "{{ docker_pihole_data_path }}/{{ docker_pihole_container_name }}"
+docker_pihole_webpassword: null
+
+...

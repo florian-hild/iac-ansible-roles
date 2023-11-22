@@ -1,0 +1,15 @@
+---
+
+- name: Run docker-compose
+  become: true
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+  ansible.builtin.shell:
+    chdir: "{{ docker_pihole_data_path }}/{{ docker_pihole_container_name }}"
+    executable: /bin/bash
+    cmd: |
+      docker-compose pull
+      docker-compose build --no-cache
+      docker-compose up --force-recreate --detach --remove-orphans
+
+...
