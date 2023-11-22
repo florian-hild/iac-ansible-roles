@@ -30,8 +30,8 @@ services:
       - '0.0.0.0:80:80/tcp'
       - '0.0.0.0:443:443/tcp'
     labels:
-      - 'traefik.http.routers.traefik-test-secure.service=api@internal'
-      - 'traefik.http.routers.traefik-test-secure.middlewares=traefik-auth'
+      - 'traefik.http.routers.{{ docker_traefik_container_name }}-secure.service=api@internal'
+      - 'traefik.http.routers.{{ docker_traefik_container_name }}-secure.middlewares=traefik-auth'
       # Create psw using: openssl passwd -salt <salt> -1 <plaintext> | sed -e s/\\$/\\$\\$/g
       - 'traefik.http.middlewares.traefik-auth.basicauth.users={{ docker_traefik_traefik_basicauth }}'
 
