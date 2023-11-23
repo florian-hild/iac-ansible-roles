@@ -1,0 +1,11 @@
+---
+
+timezone: Europe/Berlin
+
+docker_omada_data_path: /data
+docker_omada_container_name: omada
+docker_omada_container_image: 'mbentley/omada-controller:latest-chromium'
+docker_omada_project_dirs:
+  - "{{ docker_omada_data_path }}/{{ docker_omada_container_name }}"
+
+...
