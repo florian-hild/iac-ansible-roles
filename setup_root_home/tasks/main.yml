@@ -18,7 +18,7 @@
   register: check_setup_home
   changed_when: check_setup_home.rc != 0
   failed_when: check_setup_home.rc > 255
-  ansible.builtin.command: "grep -w 'dotfiles/.bash_profile' /root/.bash_profile"
+  ansible.builtin.command: "grep -w 'dotfiles/.bashrc' /root/.bashrc"
 
 - name: Run setup script
   tags: setup_root_home
