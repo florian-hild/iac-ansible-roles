@@ -1,8 +1,8 @@
 ---
 
 github_api_token: null
-root_home_repo: "https://{{ github_api_token }}@github.com/florian-hild/linux_home_root.git"
+root_home_repo: "https://{{ github_api_token }}@github.com/florian-hild/dotfiles.git"
 root_home_repo_branch: main
-root_home_dst: /root/linux_home_root
+root_home_dst: /root/.dotfiles
 
 ...
