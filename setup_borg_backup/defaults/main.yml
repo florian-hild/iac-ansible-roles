@@ -1,0 +1,42 @@
+---
+
+setup_borg_backup_pkg_apt:
+  - borgbackup
+
+# borg_backup.env
+borg_backup_passphrase: null # required
+borg_backup_repo: null # required
+borg_backup_repo_prefix: null
+borg_backup_logfile_path: null
+
+borg_backup_paths: [] # required
+borg_backup_exclude: null
+
+borg_backup_run_pre_commands: null # |-
+borg_backup_run_post_commands: null # |-
+
+borg_backup_pre_prune_keep: []
+# last: 4 # (default)
+# daily: 0 # (default)
+# weekly: 4 # (default)
+# monthly: 6 # (default)
+# yearly: 2 # (default)
+
+# Cron jobs
+borg_backup_cron: []
+# Jeden Tag um 4 Uhr
+#  minute: "10" # (default)
+#  hour: "04" # (default)
+#  day: "*" # (default)
+#  weekday: "*" # (default)
+#  month: "*" # (default)
+
+borg_backup_prune_cron: []
+# Jeden 1. im Monat um 5 Uhr
+#  minute: "10" # (default)
+#  hour: "05" # (default)
+#  day: "1" # (default)
+#  weekday: "1-2" # (default)
+#  month: "*" # (default)
+
+...

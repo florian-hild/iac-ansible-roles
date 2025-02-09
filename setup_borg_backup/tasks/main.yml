@@ -1,0 +1,78 @@
+---
+
+- name: Run block only if borg backup used
+  when: borg_backup_repo is not none
+  block:
+    - name: Include vars from setup_bash_bin role
+      tags: setup_borg_backup
+      ansible.builtin.include_vars: ../../setup_bash_bin/defaults/main.yml
+
+    - name: Check if bash_bin exists
+      tags: setup_borg_backup
+      register: bash_bin_dst
+      ansible.builtin.stat:
+        path: "{{ bash_bin_dst }}"
+
+    - name: Run role setup_bash_bin
+      tags: setup_borg_backup
+      when: not bash_bin_dst.stat.exists
+      ansible.builtin.include_role:
+        name: setup_bash_bin
+
+    - name: Install borg backup on Debian or Ubuntu system
+      tags:
+        - setup_borg_backup
+        - setup_borg_backup_install_pkg
+        - skip_ansible_lint
+      become: true
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+        state: latest
+        pkg: "{{ setup_borg_backup_pkg_apt }}"
+
+    - name: Deploy borg_backup.env
+      tags:
+        - setup_borg_backup
+        - setup_borg_backup_deploy
+      become: true
+      ansible.builtin.template:
+        src: borg_backup.env.j2
+        dest: /usr/local/etc/borg_backup.env
+        mode: "0640"
+        owner: root
+        group: root
+        backup: true
+
+    - name: Create cronjob for borg_backup.sh
+      tags:
+        - setup_borg_backup
+        - setup_borg_backup_crontab
+      become: true
+      ansible.builtin.cron:
+        name: Borg Backup script
+        user: root
+        minute: "{{ borg_backup_cron.minute | default('10') }}"
+        hour: "{{ borg_backup_cron.hour | default('4') }}"
+        day: "{{ borg_backup_cron.day | default('*') }}"
+        weekday: "{{ borg_backup_cron.weekday | default('*') }}"
+        month: "{{ borg_backup_cron.month | default('*') }}"
+        job: /usr/local/bin/borg_backup.sh --env /usr/local/etc/borg_backup.env > /dev/null 2>&1
+
+    - name: Create cronjob for prune borg_backup.sh
+      tags:
+        - setup_borg_backup
+        - setup_borg_backup_crontab
+      become: true
+      ansible.builtin.cron:
+        name: Borg Prune script
+        user: root
+        minute: "{{ borg_backup_prune_cron.minute | default('10') }}"
+        hour: "{{ borg_backup_prune_cron.hour | default('5') }}"
+        day: "{{ borg_backup_prune_cron.day | default('1') }}"
+        weekday: "{{ borg_backup_prune_cron.weekday | default('*') }}"
+        month: "{{ borg_backup_prune_cron.month | default('*') }}"
+        job: /usr/local/bin/borg_backup.sh --env /usr/local/etc/borg_backup.env --prune > /dev/null 2>&1
+
+...
